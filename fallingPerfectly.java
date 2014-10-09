@@ -1,7 +1,7 @@
 import javalib.funworld.*;
 import javalib.worldimages.*;
 import javalibworldcanvas.*;
-import javalib.colors.*
+import javalib.colors.*;
 
 class FallingPerfectly{
 }
@@ -15,7 +15,7 @@ class PlayerBlock{
 	IColor color;
 	int area;
 
-	PlayerBlock(int length; int width, IColor color){
+	PlayerBlock(int length, int width, IColor color){
 		this.pinhole = pinhole;
 		this.length = length;
 		this.width = width;
@@ -23,7 +23,7 @@ class PlayerBlock{
 		this.area = this.length * this.width;
 	}
 	WorldImage playerBlocklImage(){
-		return new RectangleImage(this. pinhole, this.length, this.width, this.color)
+		return new RectangleImage(this. pinhole, this.length, this.width, this.color);
 	}
 	 public PlayerBlock moveBlock(String ke){
 	 	if (ke.equals("right")){
@@ -54,7 +54,7 @@ public class TheGame extends World {
 	int height = 300;
  	PlayerBlock playerBlock;
 
- 	public TheGameWorld(PlayerBlock playerBlock){
+ 	public TheGame(PlayerBlock playerBlock){
  		super();
  		this.playerBlock = playerBlock;
  	}
