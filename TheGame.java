@@ -3,10 +3,6 @@ import javalib.worldimages.*;
 import javalibworldcanvas.*;
 import javalib.colors.*;
 
-class FallingPerfectly{
-}
-
-
 
 class PlayerBlock{
 	Posn pinhole;
@@ -19,7 +15,7 @@ class PlayerBlock{
 		this.pinhole = pinhole;
 		this.length = length;
 		this.width = width;
-		this.color = col;
+		this.color = color;
 		this.area = this.length * this.width;
 	}
 	WorldImage playerBlocklImage(){
@@ -47,11 +43,18 @@ class PlayerBlock{
 	 	}
 
 	}
+	public boolean outOfBounds(int width, in height){
+		return (this.pinhole.x + (this.width / 2)) > width
+		||     (this.pinhole.x - (this.width / 2)) < 0
+		||     (this.pinhole.y + (this.height / 2)) > height
+		||     (this.pinhole.y - (this.height / 2)) < 0
+	}
+
 }
 
 public class TheGame extends World {
-	int width = 500;
-	int height = 300;
+	int worldHeight = 500;
+	int worldWidth = 300;
  	PlayerBlock playerBlock;
 
  	public TheGame(PlayerBlock playerBlock){
@@ -59,7 +62,7 @@ public class TheGame extends World {
  		this.playerBlock = playerBlock;
  	}
  	public World onKeyEvent(String ke) {
- 		if (ke.equals ("x"))
+ 		if (ke.equals ("l"))
  			return this.endofWorld("Goodbye");
  		else
  			return new TheGame(this.playerBlock.moveBlock(ke));
