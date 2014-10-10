@@ -160,7 +160,8 @@ public class TheGame extends World {
  	}
  	public World onTick() {
  		if(stuckhuh) {
- 			
+ 			new DeadMouse(this.pinhole, this.height, this.width, blue);
+ 			this.mousePlacer();
  		}
 
  	}
