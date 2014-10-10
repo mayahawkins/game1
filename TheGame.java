@@ -159,6 +159,9 @@ public class TheGame extends World {
  			return new TheGame(this.playerBlock.moveBlock(ke));
  	}
  	public World onTick() {
+ 		if(stuckhuh) {
+ 			
+ 		}
 
  	}
  	//public WorldImage otherImages()
