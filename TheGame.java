@@ -2,6 +2,11 @@ import javalib.funworld.*;
 import javalib.worldimages.*;
 import javalib.worldcanvas.*;
 import javalib.colors.*;
+import java.io.*;
+import java.util.*;
+import java.awt.Color;
+import java.awt.geom.*;
+import java.util.*;
 
 
 class Mouse{
@@ -144,30 +149,56 @@ class DeadMouse {
 
 
 public class TheGame extends World{
-	int worldHeight = 500;
-	int worldWidth = 500;
+	int worldLength;
+	int worldWidth;
 	Mouse mousePlayer;
+	LinkedList stickyPaper;
+	Cat cat;
+	LinkedList deadMouse;
+	int lives;
+	int points;
 
- 	public WorldImage makeImage(){
- 		return new OverlayImages(this.mousePlayer.mouseImage(), this.mousePlayer.mouseImage());
- 	}
- 	public TheGame(Mouse mousePlayer){
- 		super();
- 		this.mousePlayer = mousePlayer;
- 	}
- 	public World onKeyEvent(String ke) {
- 		if (ke.equals ("l"))
- 			return this.endofWorld("Goodbye");
- 		else
- 			return new TheGame(this.mousePlayer.moveMouse(ke));
- 	}
+
+	public TheGame(int worldLength, int worldWidth, Mouse mousePlayer,
+					LinkedList stickyPaper, Cat cat, LinkedList deadMouse,
+					int lives, int points){
+		this.worldLength = worldLength;
+		this.worldWidth = worldWidth;
+		this.mousePlayer = mousePlayer;
+		this. stickyPaper = stickyPaper;
+		this.cat = cat;
+		this.deadMouse = deadMouse;
+		this.lives = lives;
+		this.points = points;
+	}
+
+
 // 	public World onTick() {
 // 		if(stuckhuh) {
 // 			new DeadMouse(this.pinhole, this.height, this.width, blue);
 // 			this.mousePlacer();
 // 		}
 
- //	}
+// 	}
+
+
+	
+	public WorldImage makeBoard = new RectangleImage(new Posn(0, 0), 500, 500, new Color(153, 50, 204));
+ 		
+ 	
+ 	
+
+
+
+
+ 	public WorldImage makeImage(){
+ 		return new OverlayImages(makeBoard, this.mousePlayer.mouseImage());
+ 	}
+ 	public TheGame(Mouse mousePlayer){
+ 		super();
+ 		this.mousePlayer = mousePlayer;
+ 	}
+
  	//public WorldImage otherImages()
  	public static void main (String [] args){
 
