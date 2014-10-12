@@ -7,6 +7,8 @@ import java.util.*;
 import java.awt.Color;
 import java.awt.geom.*;
 import java.util.*;
+import java.util.Random;
+
 
 
 class Mouse{
@@ -27,20 +29,20 @@ class Mouse{
 		return new RectangleImage(this.pinhole, this.width, this.length, this.color);
 	}
 	 public Mouse moveMouse(String ke){
-	 	if (ke.equals("right")){
-	 		return new Mouse(new Posn(this.pinhole.x + 10, this.pinhole.y),
+	 	if (ke.equals("right") && (this.pinhole.x + (this.width / 2) <= 500)){
+	 		return new Mouse(new Posn(this.pinhole.x + 1, this.pinhole.y),
 	 			this.width, this.length, this.color);
 	 	}
-	 	else if (ke.equals("left")){
-	 		return new Mouse(new Posn(this.pinhole.x -10, this.pinhole.y),
+	 	else if (ke.equals("left") && (this.pinhole.x - (this.width / 2) >= 0)){
+	 		return new Mouse(new Posn(this.pinhole.x -1, this.pinhole.y),
 	 			this.width, this.length, this.color);
 	 	}
-	 	else if (ke.equals("up")){
-	 		return new Mouse(new Posn(this.pinhole.x, this.pinhole.y - 10),
+	 	else if (ke.equals("up") && (this.pinhole.y - (this.length / 2) >= 0)){
+	 		return new Mouse(new Posn(this.pinhole.x, this.pinhole.y - 1),
 	 			this.width, this.length, this.color);
 	 	}
-	 	else if (ke.equals("down")){
-	 		return new Mouse(new Posn(this.pinhole.x, this.pinhole.y + 10),
+	 	else if (ke.equals("down") && (this.pinhole.y + this.length / 2) <= 500){
+	 		return new Mouse(new Posn(this.pinhole.x, this.pinhole.y + 1),
 	 			this.width, this.length, this.color);
 	 	}
 	 	else {
@@ -49,12 +51,6 @@ class Mouse{
 	}
 	public void mousePlacer(int x, int y) {
 		this.pinhole = new Posn(x, y);
-	}
-	public boolean outOfBounds(){
-		return (this.pinhole.x + (this.width / 2)) > 500
-		||     (this.pinhole.x - (this.width / 2)) < 0
-		||     (this.pinhole.y + (this.length / 2)) > 500
-		||     (this.pinhole.y - (this.length / 2)) < 0;
 	}
 }
 
@@ -124,9 +120,9 @@ class DeadMouse {
 	public Posn dPinhole;
 	public int dWidth;
 	public int dLength;
-	public IColor dColor;
+	public Color dColor;
 
-	public DeadMouse(Posn dPinhole, int dLength, int dWidth, IColor dColor){
+	public DeadMouse(Posn dPinhole, int dLength, int dWidth, Color dColor){
 		this.dPinhole = dPinhole;
 		this.dWidth = dWidth;
 		this.dLength = dLength;
@@ -181,13 +177,20 @@ public class TheGame extends World{
 	}
 
 
-// 	public World onTick() {
-// 		if(stuckhuh) {
-// 			new DeadMouse(this.pinhole, this.height, this.width, blue);
-// 			this.mousePlacer();
-// 		}
+ 	public World onTick() {
+ 		if(stuckHuh(this.mousePlayer)) {
+ 			new DeadMouse(this.mousePlayer.pinhole, this.mousePlayer.length,
+ 						  this.mousePlayer.width, new Color(0, 255, 0));
+ 			lives = this.lives - 1;
+ 			this.mousePlayer.mousePlacer(10, this.worldLength / 2);
+ 		}
+ 		else if (wrongFeeding(mousePlayer, ke))
+ 		else if(feedCat(this.mousePlayer)){
 
-// 	}
+ 		}
+
+
+ 	}
 
 
 	
