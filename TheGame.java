@@ -11,37 +11,37 @@ import java.util.*;
 
 class Mouse{
 	public Posn pinhole;
-	public int length;
 	public int width;
-	public IColor color;
+	public int length;
+	public Color color;
 	public int area;
 
-	public Mouse(Posn pinhole, int length, int width, IColor color){
+	public Mouse(Posn pinhole, int width, int length, Color color){
 		this.pinhole = pinhole;
-		this.length = length;
 		this.width = width;
+		this.length = length;
 		this.color = color;
 		this.area = this.length * this.width;
 	}
 	public WorldImage mouseImage(){
-		return new RectangleImage(this.pinhole, this.length, this.width, this.color);
+		return new RectangleImage(this.pinhole, this.width, this.length, this.color);
 	}
 	 public Mouse moveMouse(String ke){
 	 	if (ke.equals("right")){
 	 		return new Mouse(new Posn(this.pinhole.x + 10, this.pinhole.y),
-	 			this.length, this.width, this.color);
+	 			this.width, this.length, this.color);
 	 	}
 	 	else if (ke.equals("left")){
 	 		return new Mouse(new Posn(this.pinhole.x -10, this.pinhole.y),
-	 			this.length, this.width, this.color);
+	 			this.width, this.length, this.color);
 	 	}
 	 	else if (ke.equals("up")){
 	 		return new Mouse(new Posn(this.pinhole.x, this.pinhole.y - 10),
-	 			this.length, this.width, this.color);
+	 			this.width, this.length, this.color);
 	 	}
 	 	else if (ke.equals("down")){
 	 		return new Mouse(new Posn(this.pinhole.x, this.pinhole.y + 10),
-	 			this.length, this.width, this.color);
+	 			this.width, this.length, this.color);
 	 	}
 	 	else {
 	 		return this;
@@ -60,20 +60,20 @@ class Mouse{
 
 class StickyPaper {
 	public Posn sTPinhole;
-	public int sTLength;
 	public int sTWidth;
-	public IColor sTColor;
+	public int sTLength;
+	public Color sTColor;
 
-	StickyPaper(Posn sTPinhole, int sTHeight, int sTWidth, IColor sTColor){
-	this.sTPinhole = sTPinhole;
+	StickyPaper(Posn sTPinhole, int sTHeight, int sTWidth, Color sTColor){
 	this.sTLength = sTLength;
+	this.sTPinhole = sTPinhole;
 	this.sTWidth = sTWidth;
 	this.sTColor = sTColor;	
 	}
 
 	WorldImage StickyPaperImage(){
-		return new RectangleImage(this.sTPinhole, this.sTLength,
-								 this.sTWidth, this.sTColor);
+		return new RectangleImage(this.sTPinhole, this.sTWidth, 
+								  this.sTLength, this.sTColor);
 	}
 
 	public boolean stuckHuh(Mouse mousePlayer) {
@@ -87,20 +87,20 @@ class StickyPaper {
 
 class Cat {
 	public Posn cPinhole;
-	public int cLength;
 	public int cWidth;
-	public IColor cColor;
+	public int cLength;
+	public Color cColor;
 
-	Cat(Posn cPinhole, int cHeight, int cWidth, IColor cColor){
+	Cat(Posn cPinhole, int cHeight, int cWidth, Color cColor){
 	this.cPinhole = cPinhole;
-	this.cLength = cLength;
 	this.cWidth = cWidth;
+	this.cLength = cLength;
 	this.cColor = cColor;	
 	}
 
 	WorldImage CatImage(){
-		return new RectangleImage(this.cPinhole, this.cLength,
-								 this.cWidth, this.cColor);
+		return new RectangleImage(this.cPinhole, this.cWidth,
+								  this.cLength, this.cColor);
 	}
 
 	public boolean feedCat(Mouse mousePlayer, String ke) {
@@ -122,18 +122,18 @@ class Cat {
 
 class DeadMouse {
 	public Posn dPinhole;
-	public int dLength;
 	public int dWidth;
+	public int dLength;
 	public IColor dColor;
 
 	public DeadMouse(Posn dPinhole, int dLength, int dWidth, IColor dColor){
 		this.dPinhole = dPinhole;
-		this.dLength = dLength;
 		this.dWidth = dWidth;
+		this.dLength = dLength;
 		this.dColor = dColor;
 	}
 	public WorldImage deadMouseImage(){
-		return new RectangleImage(this.dPinhole, this.dLength, this.dWidth, this.dColor);
+		return new RectangleImage(this.dPinhole, this.dWidth, this.dLength, this.dColor);
 	}
 
 	public boolean lawsOfLife(Mouse mousePlayer) {
@@ -149,8 +149,8 @@ class DeadMouse {
 
 
 public class TheGame extends World{
-	int worldLength;
 	int worldWidth;
+	int worldLength;
 	Mouse mousePlayer;
 	LinkedList stickyPaper;
 	Cat cat;
@@ -159,17 +159,25 @@ public class TheGame extends World{
 	int points;
 
 
-	public TheGame(int worldLength, int worldWidth, Mouse mousePlayer,
+	public TheGame( int worldWidth, int worldLength, Mouse mousePlayer,
 					LinkedList stickyPaper, Cat cat, LinkedList deadMouse,
 					int lives, int points){
-		this.worldLength = worldLength;
 		this.worldWidth = worldWidth;
+		this.worldLength = worldLength;
 		this.mousePlayer = mousePlayer;
 		this. stickyPaper = stickyPaper;
 		this.cat = cat;
 		this.deadMouse = deadMouse;
 		this.lives = lives;
 		this.points = points;
+	}
+
+
+	public World onKey(String ke){
+		this.mousePlayer.moveMouse(ke);
+		return new TheGame(this.worldWidth, this.worldLength, this.mousePlayer,
+						   this.stickyPaper, this.cat, this.deadMouse,
+						   this.lives, this.points);
 	}
 
 
