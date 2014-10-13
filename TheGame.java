@@ -115,6 +115,17 @@ class Cat {
 			&& (mousePlayer.pinhole.y >= (this.cPinhole.y - (this.cLength / 2)))
 			&& ((ke.equals ("up")) || (ke.equals ("down")));
 	}
+
+	static Random catRand = new Random();
+	public static int randomInt(int min, int max){
+		return catRand.nextInt(((max - min) + 1) + min);
+	}
+
+
+	public void catPlacer(){
+		this.cPinhole = new Posn(500 - this.cWidth, randomInt((cLength / 2),
+								 (500 - (cLength / 2))));
+	}
 }
 
 class DeadMouse {
@@ -150,22 +161,22 @@ public class TheGame extends World{
 	int worldWidth;
 	int worldLength;
 	Mouse mousePlayer;
-	StickyPaper[] stickyPaper;
+	ArrayList<StickyPaper> stickyPaper;
 	Cat cat;
-	DeadMouse[] deadMouse;
+	ArrayList<DeadMouse> deadMouse;
 	int lives;
 	int points;
 
 
 	public TheGame( int worldWidth, int worldLength, Mouse mousePlayer,
-					StickyPaper[] stickyPaper, Cat cat, DeadMouse[] deadMouse,
+					ArrayList stickyPaper, Cat cat, ArrayList deadMouse,
 					int lives, int points){
 		this.worldWidth = worldWidth;
 		this.worldLength = worldLength;
 		this.mousePlayer = mousePlayer;
-		stickyPaper = new StickyPaper[INITIAL_CAPACITY];
+		this.stickyPaper = new ArrayList<StickyPaper>();
 		this.cat = cat;
-		this.deadMouse = deadMouse;
+		this.deadMouse = new ArrayList<DeadMouse>();
 		this.lives = lives;
 		this.points = points;
 	}
@@ -179,10 +190,10 @@ public class TheGame extends World{
 	}
 
 	public boolean stuckHuhCheck(){
-		if(!this.stickyPaper[].isEmpty()){
+		if(!stickyPaper.isEmpty()){
 			int i = 0;
-			while(i != stickyPaper[].size()){
-				if(stickyPaper[i].stuckHuh(this.mousePlayer)){
+			while(i != stickyPaper.size()){
+				if(stickyPaper.get(i).stuckHuh(this.mousePlayer)){
 					return true;
 				}
 				else {
@@ -195,18 +206,39 @@ public class TheGame extends World{
 			return false;
 	}
 
+	public boolean wrongFeedingCheck(){
+		if(!deadMouse.isEmpty()){
+			int i = 0;
+			while(i != deadMouse.size()){
+				if(deadMouse.get(i).lawsOfLife(this.mousePlayer)){
+					return true;
+				}
+				else {
+					i++;
+				}
+			}
+			return false;
+		}
+	}
+
+
+
 
  	public World onTick() {
  		if(stuckHuhCheck()){
  			new DeadMouse(this.mousePlayer.pinhole, this.mousePlayer.length,
  						  this.mousePlayer.width, new Color(0, 255, 0));
  			lives = this.lives - 1;
- 			this.mousePlayer.mousePlacer(10, this.worldLength / 2);
+ 			mousePlayer.mousePlacer(10, this.worldLength / 2);
  		}
- 		//else if (wrongFeeding(mousePlayer, ke))
- 		//else if(feedCat(this.mousePlayer)){
-
- 		//}
+ 		else if(wrongFeedingCheck(mousePlayer, ke)) {
+ 			mousePlayer.mousePlacer(10, this.worldLength / 2);
+ 		}
+ 		else if(cat.feedCat(this.mousePlayer, ke)){
+ 			mousePlayer.mousePlacer(10, this.worldLength / 2);
+ 			cat.catPlacer();
+ 		}
+ 		//else if()
  	}
 
 
@@ -227,10 +259,14 @@ public class TheGame extends World{
  		this.mousePlayer = mousePlayer;
  	}
 
+
+
  	//public WorldImage otherImages()
  	public static void main (String [] args){
 
  	}
+
+
 }
 
 	
