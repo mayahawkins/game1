@@ -206,8 +206,6 @@ public class TheGame extends World{
  		//else if(feedCat(this.mousePlayer)){
 
  		//}
-
-
  	}
 
 
