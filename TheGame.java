@@ -146,23 +146,24 @@ class DeadMouse {
 
 
 public class TheGame extends World{
+	static final int INITIAL_CAPACITY = 10;
 	int worldWidth;
 	int worldLength;
 	Mouse mousePlayer;
-	ArrayList stickyPaper;
+	StickyPaper[] stickyPaper;
 	Cat cat;
-	ArrayList deadMouse;
+	DeadMouse[] deadMouse;
 	int lives;
 	int points;
 
 
 	public TheGame( int worldWidth, int worldLength, Mouse mousePlayer,
-					ArrayList stickyPaper, Cat cat, ArrayList deadMouse,
+					StickyPaper[] stickyPaper, Cat cat, DeadMouse[] deadMouse,
 					int lives, int points){
 		this.worldWidth = worldWidth;
 		this.worldLength = worldLength;
 		this.mousePlayer = mousePlayer;
-		this. stickyPaper = stickyPaper;
+		stickyPaper = new StickyPaper[INITIAL_CAPACITY];
 		this.cat = cat;
 		this.deadMouse = deadMouse;
 		this.lives = lives;
@@ -178,10 +179,10 @@ public class TheGame extends World{
 	}
 
 	public boolean stuckHuhCheck(){
-		if(!this.stickyPaper.isEmpty()){
+		if(!this.stickyPaper[].isEmpty()){
 			int i = 0;
-			while(i != this.stickyPaper.size()){
-				if(this.stickyPaper.get(i).stuckHuh(this.mousePlayer)){
+			while(i != stickyPaper[].size()){
+				if(stickyPaper[i].stuckHuh(this.mousePlayer)){
 					return true;
 				}
 				else {
@@ -196,7 +197,7 @@ public class TheGame extends World{
 
 
  	public World onTick() {
- 		if(this.stuckHuhCheck()){
+ 		if(stuckHuhCheck()){
  			new DeadMouse(this.mousePlayer.pinhole, this.mousePlayer.length,
  						  this.mousePlayer.width, new Color(0, 255, 0));
  			lives = this.lives - 1;
