@@ -8,6 +8,7 @@ import java.awt.Color;
 import java.awt.geom.*;
 import java.util.*;
 import java.util.Random;
+import java.lang.Object.*;
 
 
 
@@ -148,15 +149,15 @@ public class TheGame extends World{
 	int worldWidth;
 	int worldLength;
 	Mouse mousePlayer;
-	LinkedList stickyPaper;
+	ArrayList stickyPaper;
 	Cat cat;
-	LinkedList deadMouse;
+	ArrayList deadMouse;
 	int lives;
 	int points;
 
 
 	public TheGame( int worldWidth, int worldLength, Mouse mousePlayer,
-					LinkedList stickyPaper, Cat cat, LinkedList deadMouse,
+					ArrayList stickyPaper, Cat cat, ArrayList deadMouse,
 					int lives, int points){
 		this.worldWidth = worldWidth;
 		this.worldLength = worldLength;
@@ -176,18 +177,35 @@ public class TheGame extends World{
 						   this.lives, this.points);
 	}
 
+	public boolean stuckHuhCheck(){
+		if(!this.stickyPaper.isEmpty()){
+			int i = 0;
+			while(i != this.stickyPaper.size()){
+				if(this.stickyPaper.get(i).stuckHuh(this.mousePlayer)){
+					return true;
+				}
+				else {
+					i++;
+				}
+			}
+			return false;
+		}
+		else 
+			return false;
+	}
+
 
  	public World onTick() {
- 		if(stuckHuh(this.mousePlayer)) {
+ 		if(this.stuckHuhCheck()){
  			new DeadMouse(this.mousePlayer.pinhole, this.mousePlayer.length,
  						  this.mousePlayer.width, new Color(0, 255, 0));
  			lives = this.lives - 1;
  			this.mousePlayer.mousePlacer(10, this.worldLength / 2);
  		}
- 		else if (wrongFeeding(mousePlayer, ke))
- 		else if(feedCat(this.mousePlayer)){
+ 		//else if (wrongFeeding(mousePlayer, ke))
+ 		//else if(feedCat(this.mousePlayer)){
 
- 		}
+ 		//}
 
 
  	}
