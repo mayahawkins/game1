@@ -100,20 +100,16 @@ class Cat {
 								  this.cLength, this.cColor);
 	}
 
-	public boolean feedCat(Mouse mousePlayer, String ke) {
-		return (mousePlayer.pinhole.x <= (500 - this.cPinhole.x + (this.cWidth / 2)))
-			&& (mousePlayer.pinhole.x >= (this.cPinhole.x - (this.cWidth / 2)))
-			&& (mousePlayer.pinhole.y <= (500 - this.cPinhole.y + (this.cLength / 2)))
-			&& (mousePlayer.pinhole.y >= (this.cPinhole.y - (this.cLength / 2)))
-			&& (ke.equals ("right"));
+	public boolean feedCat(Mouse mousePlayer) {
+		return ((mousePlayer.pinhole.x + mousePlayer.width) == (500 - this.cPinhole.x + (this.cWidth / 2)))
+			&& ((mousePlayer.pinhole.y - mousePlayer.length) > (this.cPinhole.y + (this.cLength / 2)))
+			&& ((mousePlayer.pinhole.y + mousePlayer.length) < (this.cPinhole.y - (this.cLength / 2)));
 	}
 
-	public boolean wrongFeeding(Mouse mousePlayer, String ke){
-		return (mousePlayer.pinhole.x <= (500 - this.cPinhole.x + (this.cWidth / 2)))
-			&& (mousePlayer.pinhole.x >= (this.cPinhole.x - (this.cWidth / 2)))
-			&& (mousePlayer.pinhole.y <= (500 - this.cPinhole.y + (this.cLength / 2)))
-			&& (mousePlayer.pinhole.y >= (this.cPinhole.y - (this.cLength / 2)))
-			&& ((ke.equals ("up")) || (ke.equals ("down")));
+	public boolean wrongFeeding(Mouse mousePlayer){
+		return (mousePlayer.pinhole.x > (500 - this.cPinhole.x + (this.cWidth / 2)))
+			&& ((mousePlayer.pinhole.y == (this.cPinhole.y - (this.cLength / 2))) || 
+				(mousePlayer.pinhole.y == (this.cPinhole.y + (this.cLength / 2))));
 	}
 
 	static Random catRand = new Random();
@@ -183,10 +179,9 @@ public class TheGame extends World{
 
 
 	public World onKey(String ke){
-		this.mousePlayer.moveMouse(ke);
-		return new TheGame(this.worldWidth, this.worldLength, this.mousePlayer,
-						   this.stickyPaper, this.cat, this.deadMouse,
-						   this.lives, this.points);
+		return new TheGame(worldWidth, worldLength, mousePlayer.moveMouse(ke),
+						   stickyPaper, cat, deadMouse,
+						   lives, points);
 	}
 
 	public boolean stuckHuhCheck(){
@@ -206,7 +201,7 @@ public class TheGame extends World{
 			return false;
 	}
 
-	public boolean wrongFeedingCheck(){
+	public boolean lawsOfLifeCheck(){
 		if(!deadMouse.isEmpty()){
 			int i = 0;
 			while(i != deadMouse.size()){
@@ -219,6 +214,7 @@ public class TheGame extends World{
 			}
 			return false;
 		}
+		return false;
 	}
 
 
@@ -226,21 +222,50 @@ public class TheGame extends World{
 
  	public World onTick() {
  		if(stuckHuhCheck()){
- 			new DeadMouse(this.mousePlayer.pinhole, this.mousePlayer.length,
- 						  this.mousePlayer.width, new Color(0, 255, 0));
- 			lives = this.lives - 1;
+ 			deadMouse.add((lives - 5), new DeadMouse(this.mousePlayer.pinhole, this.mousePlayer.length,
+ 						  this.mousePlayer.width, new Color(0, 255, 0)));
  			mousePlayer.mousePlacer(10, this.worldLength / 2);
+ 			return new TheGame(worldWidth, worldLength, mousePlayer,
+ 			 stickyPaper, cat, deadMouse, (lives - 1), points);
  		}
- 		else if(wrongFeedingCheck(mousePlayer, ke)) {
+ 		else if(cat.wrongFeeding(mousePlayer)) {
  			mousePlayer.mousePlacer(10, this.worldLength / 2);
+ 			return new TheGame(worldWidth, worldLength, mousePlayer,
+ 			 stickyPaper, cat, deadMouse, lives, points);
  		}
- 		else if(cat.feedCat(this.mousePlayer, ke)){
+ 		else if(cat.feedCat(mousePlayer)){
  			mousePlayer.mousePlacer(10, this.worldLength / 2);
  			cat.catPlacer();
+ 			deadMouse.clear();
+ 			stickyPaper.clear();
+ 			return new TheGame(worldWidth, worldLength, mousePlayer,
+ 			 stickyPaper, cat, deadMouse, lives, (points + 1));
  		}
- 		//else if()
+ 		else if(lawsOfLifeCheck()){
+ 		return new TheGame(worldWidth, worldLength, mousePlayer,
+ 			 stickyPaper, cat, deadMouse, 0, points);
+ 		}
+ 		else return new TheGame(worldWidth, worldLength, mousePlayer,
+ 			 stickyPaper, cat, deadMouse, lives, points);
  	}
 
+	public WorldEnd worldEnds(){
+		if(lives == 0){
+			if(points == 0){
+				return new WorldEnd(true, new OverlayImages(this.makeImage(),
+					new TextImage(new Posn((worldWidth / 2), (worldLength / 2)), 
+						("You have lost! You have fed 0 cats! Try Harder!"), Color.black)));
+			}
+			else {
+				return new WorldEnd(true, new OverlayImages(this.makeImage(),
+					new TextImage(new Posn((worldWidth / 2), (worldLength / 2)),
+					 ("You have lost! You have fed " + points + " cats! Congratulations"), Color.black)));
+			}	
+		}
+		else {
+			return new WorldEnd(false, this.makeImage());
+		}
+} 
 
 	
 	public WorldImage makeBoard = new RectangleImage(new Posn(0, 0), 500, 500, new Color(153, 50, 204));
