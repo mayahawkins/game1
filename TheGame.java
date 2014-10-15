@@ -9,7 +9,10 @@ import java.awt.geom.*;
 import java.util.*;
 import java.util.Random;
 import java.lang.Object.*;
-
+import net.slashie.libjcsi.wswing.WSwingConsoleInterface;
+import net.slashie.libjcsi.ConsoleSystemInterface;
+import net.slashie.libjcsi.CharKey;
+import java.util.concurrent.TimeUnit;
 
 
 class Mouse{
@@ -299,20 +302,31 @@ public class TheGame extends World{
  	}
 
 
- 	public TheGame(Mouse mousePlayer){
- 		super();
- 		this.mousePlayer = mousePlayer;
- 	}
-
-
-
- 	//public WorldImage otherImages()
  	public static void main (String [] args){
+ 		ArrayList<StickyPaper> stickyPaperArray = new ArrayList();
+		ArrayList<DeadMouse> deadMouseArray = new ArrayList();
+		Mouse newMousy = new mousePlayer(new Posn(10, 250), 5, 5, new Color(0, 0, 255));
+		Cat fatCat = new Cat(new Posn(495, 250), 10, 15, new Color(255, 0, 0));
+		int initLives = 5;
+		int initPoints = 0;
+		int initCounter = 0;
+		TheGame newGame = new TheGame(500, 500, newMousy, stickyPaperArray, fatCat, deadMouseArray, initLives, initPoints, initCounter);
 
+		newGame.bigBang(500, 500, 0.5);
  	}
 
 
 }
+
+
+//class Testers{
+//	static void check(String label, Object x, Object y) throws Exception {
+//		if (x != y){
+//			throws new Exception("\n" + label + ": " + x + " should equal " + y + " but it doesn't");
+//
+//		}
+//	}
+//}
 
 	
 
