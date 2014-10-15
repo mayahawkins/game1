@@ -9,10 +9,10 @@ import java.awt.geom.*;
 import java.util.*;
 import java.util.Random;
 import java.lang.Object.*;
-import net.slashie.libjcsi.wswing.WSwingConsoleInterface;
-import net.slashie.libjcsi.ConsoleSystemInterface;
-import net.slashie.libjcsi.CharKey;
-import java.util.concurrent.TimeUnit;
+//import net.slashie.libjcsi.wswing.WSwingConsoleInterface;
+//import net.slashie.libjcsi.ConsoleSystemInterface;
+//import net.slashie.libjcsi.CharKey;
+//import java.util.concurrent.TimeUnit;
 
 
 class Mouse{
@@ -91,7 +91,7 @@ class Cat {
 	public int cLength;
 	public Color cColor;
 
-	Cat(Posn cPinhole, int cHeight, int cWidth, Color cColor){
+	Cat(Posn cPinhole, int cWidth, int cLength, Color cColor){
 	this.cPinhole = cPinhole;
 	this.cWidth = cWidth;
 	this.cLength = cLength;
@@ -133,7 +133,7 @@ class DeadMouse {
 	public int dLength;
 	public Color dColor;
 
-	public DeadMouse(Posn dPinhole, int dLength, int dWidth, Color dColor){
+	public DeadMouse(Posn dPinhole, int dWidth, int dLength, Color dColor){
 		this.dPinhole = dPinhole;
 		this.dWidth = dWidth;
 		this.dLength = dLength;
@@ -156,7 +156,6 @@ class DeadMouse {
 
 
 public class TheGame extends World{
-	static final int INITIAL_CAPACITY = 10;
 	int worldWidth;
 	int worldLength;
 	Mouse mousePlayer;
@@ -167,8 +166,12 @@ public class TheGame extends World{
 	int points;
 	int counter;
 
+	public TheGame(){
 
-	public TheGame( int worldWidth, int worldLength, Mouse mousePlayer,
+	}
+
+
+	public TheGame(int worldWidth, int worldLength, Mouse mousePlayer,
 					ArrayList stickyPaper, Cat cat, ArrayList deadMouse,
 					int lives, int points, int counter){
 		this.worldWidth = worldWidth;
@@ -183,7 +186,8 @@ public class TheGame extends World{
 	}
 
 
-	public World onKey(String ke){
+	public World onKeyEvent(String ke){
+		System.out.println("This is the ke: " + ke);
 		return new TheGame(worldWidth, worldLength, mousePlayer.moveMouse(ke),
 						   stickyPaper, cat, deadMouse,
 						   lives, points, counter);
@@ -193,16 +197,14 @@ public class TheGame extends World{
 		if(!stickyPaper.isEmpty()){
 			int i = 0;
 			while(i != stickyPaper.size()){
-				if(stickyPaper.get(i).stuckHuh(this.mousePlayer)){
+				if(stickyPaper.get(i).stuckHuh(mousePlayer)){
 					return true;
 				}
-				else {
+				else{
 					i++;
 				}
 			}
-			return false;
 		}
-		else 
 			return false;
 	}
 
@@ -210,14 +212,13 @@ public class TheGame extends World{
 		if(!deadMouse.isEmpty()){
 			int i = 0;
 			while(i != deadMouse.size()){
-				if(deadMouse.get(i).lawsOfLife(this.mousePlayer)){
+				if(deadMouse.get(i).lawsOfLife(mousePlayer)){
 					return true;
 				}
 				else {
 					i++;
 				}
 			}
-			return false;
 		}
 		return false;
 	}
@@ -229,6 +230,7 @@ public class TheGame extends World{
 
 
  	public World onTick() {
+ 		System.out.println("On Tick is Running, the counter is " + counter);
  		if(stuckHuhCheck()){
  			deadMouse.add((5 - lives), new DeadMouse(this.mousePlayer.pinhole, this.mousePlayer.length,
  						  this.mousePlayer.width, new Color(0, 255, 0)));
@@ -254,8 +256,9 @@ public class TheGame extends World{
  			 stickyPaper, cat, deadMouse, 0, points, counter);
  		}
  		else if(((points <= 10) && (counter == 12 - points)) || ((points >= 10) && (counter == 2))){
- 			int randWidth = wRandomInt(7, 15);
- 			int randLength = wRandomInt(7, 15);
+ 			int randWidth = wRandomInt(15, 25);
+ 			int randLength = wRandomInt(15, 25);
+ 			System.out.println("Making a sticky!");
  			int randXPosn = wRandomInt((mousePlayer.pinhole.x + (mousePlayer.width / 2) + 4 + (randWidth / 2)), (cat.cPinhole.x - (randWidth + 5)));
  			int randYPosn = wRandomInt((randLength / 2), (500 - randLength / 2));
 
@@ -287,46 +290,136 @@ public class TheGame extends World{
 	} 
 
 	
-	public WorldImage makeBoard = new RectangleImage(new Posn(0, 0), 500, 500, new Color(153, 50, 204));
+	public WorldImage makeBoard = new RectangleImage(new Posn(250, 250), 500, 500, new Color(153, 50, 204));
  		
  	
- 	
+ 	public WorldImage stickyPaperLoop(int i){
+ 		while(i != stickyPaper.size()){
+ 			return new OverlayImages(stickyPaper.get(i).stickyPaperImage(), stickyPaperLoop(i++)); 
+ 		}
+	return new RectangleImage(new Posn (0, 0), 0, 0, new Color(0, 0, 0));
+ 	}
 
-
+public WorldImage deadMouseLoop(int i){
+	while(i != deadMouse.size()){
+		return new OverlayImages(deadMouse.get(i).deadMouseImage(), deadMouseLoop(i++));
+	}
+	return new RectangleImage(new Posn (0, 0), 0, 0, new Color(0, 0, 0));
+}
 
 
  	public WorldImage makeImage(){
- 		return new OverlayImages(makeboard, new OverlayImages(new TextImage(new Posn(475, 7), "Lives left: " + lives, 10, new Color(0, 0, 128)),
- 			new OverlayImages(new TextImage(new Posn(475, 475), "Cats Fed: " + points, 10, new Color(0, 0, 128)),
- 			new OverlayImages(cat.catImage(), new OverlayImages(stickyPaper.stickyPaperImage(), new OverlayImages(this.deadMouse.deadMouseImage(), mousePlayer.mouseImage()))))));
+ 		return new OverlayImages(makeBoard, new OverlayImages(new TextImage(new Posn(425, 25), "Lives left: " + lives, 20, new Color(0, 0, 128)),
+ 			new OverlayImages(new TextImage(new Posn(425, 475), "Cats Fed: " + points, 20, new Color(0, 0, 128)),
+ 			new OverlayImages(cat.catImage(), new OverlayImages(stickyPaperLoop(0), new OverlayImages(deadMouseLoop(0), mousePlayer.mouseImage()))))));
  	}
+
+	static Random rand = new Random();
+    public static int randomInt(int min, int max) {
+        return rand.nextInt((max - min) + 1) + min;
+    }
+
+ 	public static void moveMouseTester(int i){
+ 		Mouse testMousey = new Mouse(new Posn(10, 10), 10, 10, new Color(0, 0, 255)); 
+ 		if(i == 1){
+ 			System.out.println("TestMousy should have the x 11 and it is " + testMousey.moveMouse("right").pinhole.x);
+ 		}
+ 		else if(i == 2){
+ 			 System.out.println("TestMousy should have the x 9 and it is " + testMousey.moveMouse("left").pinhole.x);
+ 		}
+ 		else if(i == 3){
+ 			 System.out.println("TestMousy should have the y 11 and it is " + testMousey.moveMouse("down").pinhole.y);
+ 		}
+ 		else if(i == 4){
+ 			 System.out.println("TestMousy should have the y 9 and it is " + testMousey.moveMouse("up").pinhole.y);
+ 		}
+ 	}
+
+ 	public static void moveMouseTester(){
+ 		int x = 0;
+ 		while(x != 20){
+ 			moveMouseTester(randomInt(1, 4));
+ 			x++;
+ 		}
+ 	}
+
+
+
+
+
+
 
 
  	public static void main (String [] args){
  		ArrayList<StickyPaper> stickyPaperArray = new ArrayList();
 		ArrayList<DeadMouse> deadMouseArray = new ArrayList();
-		Mouse newMousy = new mousePlayer(new Posn(10, 250), 5, 5, new Color(0, 0, 255));
-		Cat fatCat = new Cat(new Posn(495, 250), 10, 15, new Color(255, 0, 0));
+		Mouse newMousy = new Mouse(new Posn(10, 250), 10, 10, new Color(0, 0, 255));
+		Cat fatCat = new Cat(new Posn(495, 250), 20, 25, new Color(255, 0, 0));
 		int initLives = 5;
 		int initPoints = 0;
 		int initCounter = 0;
+
+
+		System.out.println("newMousy should have the x 11 and it is " + newMousy.moveMouse("right").pinhole.x);
+		
+
+		moveMouseTester();
+
 		TheGame newGame = new TheGame(500, 500, newMousy, stickyPaperArray, fatCat, deadMouseArray, initLives, initPoints, initCounter);
 
-		newGame.bigBang(500, 500, 0.5);
+		newGame.bigBang(500, 500, 0.1);
  	}
 
 
 }
 
 
-//class Testers{
+class Exceptions{
+	static int gameStartTester = 0;
+	static int stickyHit = 0;
+	static int catHit = 0;
+	static int deadMouseHit = 0;
+
+
+
+
+
+/*	static void gameStartTester() throws Exception {
+		TheGame testerGame = new TheGame(); 
+		if(testerGame.mousePlayer.pinhole.x != 10 && testerGame.mousePlayer.pinhole.y != (testerGame.worldLength / 2)){
+			throw new Exception("Mouse is in the WRONG place");
+		}
+		if(!testerGame.stickyPaper.isEmpty()){
+			throw new Exception("StickyPaper is NOT empty");
+		}
+		if(testerGame.cat.cPinhole.x != 495 && testerGame.cPinhole.y != 250){
+			throw new Exception("Cat is in the WRONG place");
+		}
+		if(!testerGame.deadMouse.isEmpty()){
+			throw new Exception("DeadMouse is NOT empty");
+		}
+		if(testerGame.lives != 5){
+			throw new Exception("Player does NOT start off with 5 lives");
+		}
+		if(testerGame.points != 0){
+			throw new Exception("Player does NOT start off with 0 points");
+		}
+		if(testerGame.counter != 0){
+			throw new Exception("Game does NOT start with a 0 counter");
+		}
+
+
+	}
+*/
+
+
 //	static void check(String label, Object x, Object y) throws Exception {
 //		if (x != y){
-//			throws new Exception("\n" + label + ": " + x + " should equal " + y + " but it doesn't");
-//
+///			throws new Exception("\n" + label + ": " + x + " should equal " + y + " but it doesn't");
+
 //		}
 //	}
-//}
+}
 
 	
 
