@@ -68,7 +68,7 @@ class StickyPaper {
 	this.sTColor = sTColor;	
 	}
 
-	WorldImage StickyPaperImage(){
+	WorldImage stickyPaperImage(){
 		return new RectangleImage(this.sTPinhole, this.sTWidth, 
 								  this.sTLength, this.sTColor);
 	}
@@ -95,7 +95,7 @@ class Cat {
 	this.cColor = cColor;	
 	}
 
-	WorldImage CatImage(){
+	WorldImage catImage(){
 		return new RectangleImage(this.cPinhole, this.cWidth,
 								  this.cLength, this.cColor);
 	}
@@ -295,7 +295,7 @@ public class TheGame extends World{
  	public WorldImage makeImage(){
  		return new OverlayImages(makeboard, new OverlayImages(new TextImage(new Posn(475, 7), "Lives left: " + lives, 10, new Color(0, 0, 128)),
  			new OverlayImages(new TextImage(new Posn(475, 475), "Cats Fed: " + points, 10, new Color(0, 0, 128)),
- 			new OverlayImages(cat, new OverlayImages(stickyPaper, new OverlayImages(deadMouse, mousePlayer))))));
+ 			new OverlayImages(cat.catImage(), new OverlayImages(stickyPaper.stickyPaperImage(), new OverlayImages(this.deadMouse.deadMouseImage(), mousePlayer.mouseImage()))))));
  	}
 
 
