@@ -263,7 +263,7 @@ public class TheGame extends World{
  			int randYPosn = wRandomInt((randLength / 2), (500 - randLength / 2));
 
  			stickyPaper.add(stickyPaper.size(), new StickyPaper(new Posn(randXPosn, randYPosn), randWidth, randLength, new Color(255, 255, 0)));
- 
+	 
  			return new TheGame(worldWidth, worldLength, mousePlayer, stickyPaper, cat, deadMouse, lives, points, 0);
  		}
 
