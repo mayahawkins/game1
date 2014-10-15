@@ -53,8 +53,8 @@ class Mouse{
 	 		return this;
 	 	}
 	}
-	public void mousePlacer(int x, int y) {
-		this.pinhole = new Posn(x, y);
+	public Mouse mousePlacer(int x, int y) {
+		return new Mouse(new Posn(x, y), this.width, this.length, this.color);
 	}
 }
 
@@ -104,15 +104,9 @@ class Cat {
 	}
 
 	public boolean feedCat(Mouse mousePlayer) {
-		return ((mousePlayer.pinhole.x + mousePlayer.width) == (500 - this.cPinhole.x + (this.cWidth / 2)))
-			&& ((mousePlayer.pinhole.y - mousePlayer.length) > (this.cPinhole.y + (this.cLength / 2)))
-			&& ((mousePlayer.pinhole.y + mousePlayer.length) < (this.cPinhole.y - (this.cLength / 2)));
-	}
-
-	public boolean wrongFeeding(Mouse mousePlayer){
-		return (mousePlayer.pinhole.x > (500 - this.cPinhole.x + (this.cWidth / 2)))
-			&& ((mousePlayer.pinhole.y == (this.cPinhole.y - (this.cLength / 2))) || 
-				(mousePlayer.pinhole.y == (this.cPinhole.y + (this.cLength / 2))));
+		return (((mousePlayer.pinhole.x + (mousePlayer.width / 2)) >= (500 - (500 - (this.cPinhole.x - (this.cWidth / 2)))))
+			&& ((mousePlayer.pinhole.y - (mousePlayer.length / 2)) >= (this.cPinhole.y - (this.cLength / 2)))
+			&& ((mousePlayer.pinhole.y + mousePlayer.length / 2) <= (this.cPinhole.y + (this.cLength / 2))));
 	}
 
 	static Random catRand = new Random();
@@ -121,9 +115,9 @@ class Cat {
 	}
 
 
-	public void catPlacer(){
-		this.cPinhole = new Posn(500 - this.cWidth, randomInt((cLength / 2),
-								 (500 - (cLength / 2))));
+	public Cat catPlacer(){
+		return new Cat(new Posn(500 - this.cWidth, randomInt((cLength / 2),
+								 (500 - (cLength / 2)))), this.cWidth, this.cLength, this.cColor);
 	}
 }
 
@@ -177,7 +171,7 @@ public class TheGame extends World{
 		this.worldWidth = worldWidth;
 		this.worldLength = worldLength;
 		this.mousePlayer = mousePlayer;
-		this.stickyPaper = new ArrayList<StickyPaper>();
+		this.stickyPaper = stickyPaper;
 		this.cat = cat;
 		this.deadMouse = new ArrayList<DeadMouse>();
 		this.lives = lives;
@@ -231,38 +225,32 @@ public class TheGame extends World{
 
  	public World onTick() {
  		System.out.println("On Tick is Running, the counter is " + counter);
+ 		System.out.println("The amount of stickies is " + stickyPaper.size());
  		if(stuckHuhCheck()){
+ 			System.out.println("Oh no, dieing!");
  			deadMouse.add((5 - lives), new DeadMouse(this.mousePlayer.pinhole, this.mousePlayer.length,
  						  this.mousePlayer.width, new Color(0, 255, 0)));
  			mousePlayer.mousePlacer(10, this.worldLength / 2);
  			return new TheGame(worldWidth, worldLength, mousePlayer,
  			 stickyPaper, cat, deadMouse, (lives - 1), points, counter);
  		}
- 		else if(cat.wrongFeeding(mousePlayer)) {
- 			mousePlayer.mousePlacer(10, this.worldLength / 2);
- 			return new TheGame(worldWidth, worldLength, mousePlayer,
- 			 stickyPaper, cat, deadMouse, lives, points, counter);
- 		}
  		else if(cat.feedCat(mousePlayer)){
- 			mousePlayer.mousePlacer(10, this.worldLength / 2);
- 			cat.catPlacer();
- 			deadMouse.clear();
- 			stickyPaper.clear();
- 			return new TheGame(worldWidth, worldLength, mousePlayer,
- 			 stickyPaper, cat, deadMouse, lives, (points + 1), counter);
+ 			System.out.println("yay, feeding!");
+ 			return new TheGame(worldWidth, worldLength, mousePlayer.mousePlacer(10, this.worldLength / 2),
+ 			 new ArrayList<StickyPaper>(), cat.catPlacer(), new ArrayList<DeadMouse>(), lives, (points + 1), 0);
  		}
  		else if(lawsOfLifeCheck()){
  		return new TheGame(worldWidth, worldLength, mousePlayer,
  			 stickyPaper, cat, deadMouse, 0, points, counter);
  		}
  		else if(((points <= 10) && (counter == 12 - points)) || ((points >= 10) && (counter == 2))){
- 			int randWidth = wRandomInt(15, 25);
- 			int randLength = wRandomInt(15, 25);
  			System.out.println("Making a sticky!");
- 			int randXPosn = wRandomInt((mousePlayer.pinhole.x + (mousePlayer.width / 2) + 4 + (randWidth / 2)), (cat.cPinhole.x - (randWidth + 5)));
- 			int randYPosn = wRandomInt((randLength / 2), (500 - randLength / 2));
 
- 			stickyPaper.add(stickyPaper.size(), new StickyPaper(new Posn(randXPosn, randYPosn), randWidth, randLength, new Color(255, 255, 0)));
+
+ 			stickyPaper.add(stickyPaper.size(), new StickyPaper(new Posn(wRandomInt((mousePlayer.pinhole.x + (mousePlayer.width / 2) + 4 + wRandomInt(15, 25)),
+ 			cat.cPinhole.x - 30),
+ 			 wRandomInt(0, 500)), wRandomInt(15, 25), wRandomInt(15, 25), new Color(255, 255, 0)));
+ 		System.out.println("The amount of stickies is now " + stickyPaper.size());
 	 
  			return new TheGame(worldWidth, worldLength, mousePlayer, stickyPaper, cat, deadMouse, lives, points, 0);
  		}
@@ -293,9 +281,9 @@ public class TheGame extends World{
 	public WorldImage makeBoard = new RectangleImage(new Posn(250, 250), 500, 500, new Color(153, 50, 204));
  		
  	
- 	public WorldImage stickyPaperLoop(int i){
- 		while(i != stickyPaper.size()){
- 			return new OverlayImages(stickyPaper.get(i).stickyPaperImage(), stickyPaperLoop(i++)); 
+ 	public WorldImage stickyPaperLoop(){
+ 		for(int i = 0; i < stickyPaper.size(); i++){
+ 			new OverlayImages(stickyPaper.get(i).stickyPaperImage(), stickyPaperLoop()); 
  		}
 	return new RectangleImage(new Posn (0, 0), 0, 0, new Color(0, 0, 0));
  	}
@@ -311,7 +299,7 @@ public WorldImage deadMouseLoop(int i){
  	public WorldImage makeImage(){
  		return new OverlayImages(makeBoard, new OverlayImages(new TextImage(new Posn(425, 25), "Lives left: " + lives, 20, new Color(0, 0, 128)),
  			new OverlayImages(new TextImage(new Posn(425, 475), "Cats Fed: " + points, 20, new Color(0, 0, 128)),
- 			new OverlayImages(cat.catImage(), new OverlayImages(stickyPaperLoop(0), new OverlayImages(deadMouseLoop(0), mousePlayer.mouseImage()))))));
+ 			new OverlayImages(cat.catImage(), new OverlayImages(stickyPaperLoop(), new OverlayImages(deadMouseLoop(0), mousePlayer.mouseImage()))))));
  	}
 
 	static Random rand = new Random();
@@ -343,8 +331,11 @@ public WorldImage deadMouseLoop(int i){
  		}
  	}
 
-
-
+	public static void catFeedTester(){
+		Mouse testMousey = new Mouse(new Posn(10, 10), 10, 10, new Color(0, 0, 255));
+		Cat testFatCat = new Cat(new Posn(35, 10), 15, 15, new Color(255, 0, 0));
+		
+	}
 
 
 
@@ -363,7 +354,7 @@ public WorldImage deadMouseLoop(int i){
 		System.out.println("newMousy should have the x 11 and it is " + newMousy.moveMouse("right").pinhole.x);
 		
 
-		moveMouseTester();
+//		moveMouseTester();
 
 		TheGame newGame = new TheGame(500, 500, newMousy, stickyPaperArray, fatCat, deadMouseArray, initLives, initPoints, initCounter);
 
