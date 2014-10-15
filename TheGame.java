@@ -61,9 +61,9 @@ class StickyPaper {
 	public int sTLength;
 	public Color sTColor;
 
-	StickyPaper(Posn sTPinhole, int sTHeight, int sTWidth, Color sTColor){
-	this.sTLength = sTLength;
+	StickyPaper(Posn sTPinhole, int sTWidth, int sTLength, Color sTColor){
 	this.sTPinhole = sTPinhole;
+	this.sTLength = sTLength;
 	this.sTWidth = sTWidth;
 	this.sTColor = sTColor;	
 	}
@@ -162,11 +162,12 @@ public class TheGame extends World{
 	ArrayList<DeadMouse> deadMouse;
 	int lives;
 	int points;
+	int counter;
 
 
 	public TheGame( int worldWidth, int worldLength, Mouse mousePlayer,
 					ArrayList stickyPaper, Cat cat, ArrayList deadMouse,
-					int lives, int points){
+					int lives, int points, int counter){
 		this.worldWidth = worldWidth;
 		this.worldLength = worldLength;
 		this.mousePlayer = mousePlayer;
@@ -175,13 +176,14 @@ public class TheGame extends World{
 		this.deadMouse = new ArrayList<DeadMouse>();
 		this.lives = lives;
 		this.points = points;
+		this.counter = counter;
 	}
 
 
 	public World onKey(String ke){
 		return new TheGame(worldWidth, worldLength, mousePlayer.moveMouse(ke),
 						   stickyPaper, cat, deadMouse,
-						   lives, points);
+						   lives, points, counter);
 	}
 
 	public boolean stuckHuhCheck(){
@@ -217,21 +219,24 @@ public class TheGame extends World{
 		return false;
 	}
 
-
+	static Random wRand = new Random();
+	public static int wRandomInt(int min, int max){
+		return wRand.nextInt(((max - min) + 1) + min);
+	}
 
 
  	public World onTick() {
  		if(stuckHuhCheck()){
- 			deadMouse.add((lives - 5), new DeadMouse(this.mousePlayer.pinhole, this.mousePlayer.length,
+ 			deadMouse.add((5 - lives), new DeadMouse(this.mousePlayer.pinhole, this.mousePlayer.length,
  						  this.mousePlayer.width, new Color(0, 255, 0)));
  			mousePlayer.mousePlacer(10, this.worldLength / 2);
  			return new TheGame(worldWidth, worldLength, mousePlayer,
- 			 stickyPaper, cat, deadMouse, (lives - 1), points);
+ 			 stickyPaper, cat, deadMouse, (lives - 1), points, counter);
  		}
  		else if(cat.wrongFeeding(mousePlayer)) {
  			mousePlayer.mousePlacer(10, this.worldLength / 2);
  			return new TheGame(worldWidth, worldLength, mousePlayer,
- 			 stickyPaper, cat, deadMouse, lives, points);
+ 			 stickyPaper, cat, deadMouse, lives, points, counter);
  		}
  		else if(cat.feedCat(mousePlayer)){
  			mousePlayer.mousePlacer(10, this.worldLength / 2);
@@ -239,14 +244,25 @@ public class TheGame extends World{
  			deadMouse.clear();
  			stickyPaper.clear();
  			return new TheGame(worldWidth, worldLength, mousePlayer,
- 			 stickyPaper, cat, deadMouse, lives, (points + 1));
+ 			 stickyPaper, cat, deadMouse, lives, (points + 1), counter);
  		}
  		else if(lawsOfLifeCheck()){
  		return new TheGame(worldWidth, worldLength, mousePlayer,
- 			 stickyPaper, cat, deadMouse, 0, points);
+ 			 stickyPaper, cat, deadMouse, 0, points, counter);
  		}
+ 		else if(((points <= 10) && (counter == 12 - points)) || ((points >= 10) && (counter == 2))){
+ 			int randWidth = wRandomInt(7, 15);
+ 			int randLength = wRandomInt(7, 15);
+ 			int randXPosn = wRandomInt((mousePlayer.pinhole.x + (mousePlayer.width / 2) + 4 + (randWidth / 2)), (cat.cPinhole.x - (randWidth + 5)));
+ 			int randYPosn = wRandomInt((randLength / 2), (500 - randLength / 2));
+
+ 			stickyPaper.add(stickyPaper.size(), new StickyPaper(new Posn(randXPosn, randYPosn), randWidth, randLength, new Color(255, 255, 0)));
+ 
+ 			return new TheGame(worldWidth, worldLength, mousePlayer, stickyPaper, cat, deadMouse, lives, points, 0);
+ 		}
+
  		else return new TheGame(worldWidth, worldLength, mousePlayer,
- 			 stickyPaper, cat, deadMouse, lives, points);
+ 			 stickyPaper, cat, deadMouse, lives, points, (counter + 1));
  	}
 
 	public WorldEnd worldEnds(){
@@ -277,7 +293,7 @@ public class TheGame extends World{
 
 
  	public WorldImage makeImage(){
- 		return new OverlayImages(makeBoard, this.mousePlayer.mouseImage());
+ 		return new OverlayImages(makeBoard, TheGame(worldWidth, worldLength, mousePlayer, stickyPaper, cat, deadMouse, lives, points, counter));
  	}
  	public TheGame(Mouse mousePlayer){
  		super();
