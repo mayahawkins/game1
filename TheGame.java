@@ -115,6 +115,9 @@ class Cat {
 	}
 
 
+public Cat catPlacer(int x, int y){
+		return new Cat(new Posn(x, y), this.cWidth, this.cLength, this.cColor);
+}
 	public Cat catPlacer(){
 		return new Cat(new Posn(500 - this.cWidth, randomInt((cLength / 2),
 								 (500 - (cLength / 2)))), this.cWidth, this.cLength, this.cColor);
@@ -173,7 +176,7 @@ public class TheGame extends World{
 		this.mousePlayer = mousePlayer;
 		this.stickyPaper = stickyPaper;
 		this.cat = cat;
-		this.deadMouse = new ArrayList<DeadMouse>();
+		this.deadMouse = deadMouse;
 		this.lives = lives;
 		this.points = points;
 		this.counter = counter;
@@ -332,12 +335,80 @@ public WorldImage deadMouseLoop(int i){
  	}
 
 	public static void catFeedTester(){
+		int x = 0;
 		Mouse testMousey = new Mouse(new Posn(10, 10), 10, 10, new Color(0, 0, 255));
 		Cat testFatCat = new Cat(new Posn(35, 10), 15, 15, new Color(255, 0, 0));
-		
+		while(x != 20){
+			int estMoves = (testFatCat.cPinhole.x - (testFatCat.cWidth / 2)) - (testMousey.pinhole.x + (testMousey.width / 2));
+			int counter = 0;
+			while((testFatCat.feedCat(testMousey) != true) || (counter <= estMoves)){
+				testMousey.moveMouse("right");
+				counter++;
+				System.out.println("Moving right, counter is " + counter + "and estMoves is " + estMoves);
+			}
+			if(counter == estMoves){
+				System.out.println("The mouse never met the cat!");
+			}
+			else{
+			counter++;	
+			System.out.println("Should take about " + estMoves + " moves. It took " + counter + " moves.");
+			testMousey.mousePlacer(10, 10);
+			testFatCat.catPlacer(10, randomInt(20, 40));
+			}
+			x++;
+		}
 	}
 
+	public static void lawsOfLifeTester(){
 
+		ArrayList<DeadMouse> testydeadMouse = new ArrayList();
+		Mouse testyMousy = new Mouse(new Posn(10, 250), 10, 10, new Color(0, 0, 255));
+
+		testydeadMouse.add(new DeadMouse(new Posn(30, 50), 10, 100, new Color(0, 0, 0,)));
+		testydeadMouse.add(new DeadMouse(new Posn(30, 150), 10, 100, new Color(0, 0, 0,)));
+		testydeadMouse.add(new DeadMouse(new Posn(30, 250), 10, 100, new Color(0, 0, 0,)));
+		testydeadMouse.add(new DeadMouse(new Posn(30, 350), 10, 100, new Color(0, 0, 0,)));
+		testydeadMouse.add(new DeadMouse(new Posn(30, 450), 10, 100, new Color(0, 0, 0,)));
+		int counter = 0
+		int estMoves = (30 - (testyMousy.pinhole.x + (testMousey.width / 2)));
+			while((testdeadMouse.lawsOfLifeCheck() == false) || counter != estMoves){
+				testMousey.moveMouse("right");
+				counter++;
+			}
+			if(counter == estMoves){
+				System.out.println("The mouse didn't meet it's past self!")
+			}
+			else{
+				System.out.println("The mouse met its past self")
+			}
+
+		}
+
+	public static void stuckHuhTester(){
+
+		ArrayList<StickyPaper> testyStickyPaper = new ArrayList();
+		Mouse testyMousy = new Mouse(new Posn(10, 250), 10, 10, new Color(0, 0, 255));
+		testyStickyPaper.add(new DeadMouse(new Posn(30, 50), 10, 100, new Color(0, 0, 0,)));
+
+		int estMoves = (30 - (testyMousy.pinhole.x + (testMousey.width / 2)));
+		testyStickyPaper.add(new DeadMouse(new Posn(30, 150), 10, 100, new Color(255, 255, 0,)));
+		testyStickyPaper.add(new DeadMouse(new Posn(30, 250), 10, 100, new Color(255, 255, 0,)));
+		testyStickyPaper.add(new DeadMouse(new Posn(30, 350), 10, 100, new Color(255, 255, 0,)));
+		testyStickyPaper.add(new DeadMouse(new Posn(30, 450), 10, 100, new Color(255, 255, 0,)));
+
+
+			while((testyStickyPaper.stuckHuhCheck() == false) || counter != estMoves){
+				testMousey.moveMouse("right");
+				counter++;
+			}
+			if(counter == estMoves){
+				System.out.println("The mouse didn't get caught on the sticky paper")
+			}
+			else{
+				System.out.println("The mouse met got caught on the sticky paper")
+			}
+
+		}
 
 
 
@@ -354,64 +425,18 @@ public WorldImage deadMouseLoop(int i){
 		System.out.println("newMousy should have the x 11 and it is " + newMousy.moveMouse("right").pinhole.x);
 		
 
-//		moveMouseTester();
+		moveMouseTester();
 
-		TheGame newGame = new TheGame(500, 500, newMousy, stickyPaperArray, fatCat, deadMouseArray, initLives, initPoints, initCounter);
+// 		catFeedTester();
 
-		newGame.bigBang(500, 500, 0.1);
+//		TheGame newGame = new TheGame(500, 500, newMousy, stickyPaperArray, fatCat, deadMouseArray, initLives, initPoints, initCounter);
+
+//		newGame.bigBang(500, 500, 0.1);
  	}
 
 
 }
 
 
-class Exceptions{
-	static int gameStartTester = 0;
-	static int stickyHit = 0;
-	static int catHit = 0;
-	static int deadMouseHit = 0;
-
-
-
-
-
-/*	static void gameStartTester() throws Exception {
-		TheGame testerGame = new TheGame(); 
-		if(testerGame.mousePlayer.pinhole.x != 10 && testerGame.mousePlayer.pinhole.y != (testerGame.worldLength / 2)){
-			throw new Exception("Mouse is in the WRONG place");
-		}
-		if(!testerGame.stickyPaper.isEmpty()){
-			throw new Exception("StickyPaper is NOT empty");
-		}
-		if(testerGame.cat.cPinhole.x != 495 && testerGame.cPinhole.y != 250){
-			throw new Exception("Cat is in the WRONG place");
-		}
-		if(!testerGame.deadMouse.isEmpty()){
-			throw new Exception("DeadMouse is NOT empty");
-		}
-		if(testerGame.lives != 5){
-			throw new Exception("Player does NOT start off with 5 lives");
-		}
-		if(testerGame.points != 0){
-			throw new Exception("Player does NOT start off with 0 points");
-		}
-		if(testerGame.counter != 0){
-			throw new Exception("Game does NOT start with a 0 counter");
-		}
-
-
-	}
-*/
-
-
-//	static void check(String label, Object x, Object y) throws Exception {
-//		if (x != y){
-///			throws new Exception("\n" + label + ": " + x + " should equal " + y + " but it doesn't");
-
-//		}
-//	}
-}
-
-	
 
  
